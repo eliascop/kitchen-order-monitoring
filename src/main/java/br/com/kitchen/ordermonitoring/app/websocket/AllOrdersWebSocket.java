@@ -1,5 +1,6 @@
 package br.com.kitchen.ordermonitoring.app.websocket;
 
+import br.com.kitchen.ordermonitoring.app.dto.OrderDTO;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
@@ -28,12 +29,11 @@ public class AllOrdersWebSocket {
         System.out.println("Cliente desconectado do WebSocket global");
     }
 
-    public static void notifyAll(String orderId, String status) {
-        String payload = "{\"orderId\":\"" + orderId + "\", \"status\":\"" + status + "\"}";
+    public static void notifyAll(String message) {
         for (Session session : sessions) {
             if (session.isOpen()) {
                 try {
-                    session.getBasicRemote().sendText(payload);
+                    session.getBasicRemote().sendText(message);
                 } catch (IOException e) {
                     System.err.println("Erro ao enviar para o painel: " + e.getMessage());
                 }

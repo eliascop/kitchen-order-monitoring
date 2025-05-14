@@ -1,5 +1,8 @@
 package br.com.kitchen.ordermonitoring.app.websocket;
 
+import br.com.kitchen.ordermonitoring.app.dto.OrderDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
@@ -59,9 +62,14 @@ public class OrderWebSocket {
         }
     }
 
-    public static void notifyOrderUpdate(String orderId, String status) {
-        String payload = "{\"orderId\":\"" + orderId + "\", \"status\":\"" + status + "\"}";
-        sendToOrder(orderId, payload);
-        AllOrdersWebSocket.notifyAll(orderId, status);
+    public static void notifyOrderUpdate(OrderDTO orderDTO) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String message = mapper.writeValueAsString(orderDTO);
+            sendToOrder(orderDTO.getId().toString(), message);
+            AllOrdersWebSocket.notifyAll(message);
+        } catch (JsonProcessingException e) {
+            System.out.println("Ocorreu um erro ao enviar o status: "+orderDTO.toString());
+        }
     }
 }
